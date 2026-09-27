@@ -87,3 +87,13 @@ html:has(.publishedPage),body:has(.publishedPage){margin:0!important;padding:0!i
  .base44App .previewBrowser{position:static!important;width:100%!important}
  .base44App .previewStage iframe{width:100%!important;height:calc(100% - 34px)!important}
 }
+
+
+/* Project/page identity */
+.base44App .pagesProjectHead{display:flex;flex-direction:column;gap:3px;padding:12px 10px 10px;border:1px solid #292c33;border-radius:11px;background:#15171b;margin-bottom:10px}
+.base44App .pagesProjectHead strong{font-size:15px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.base44App .pagesProjectHead span{font-size:11px;color:#858b96}
+.base44App .pageNameRow{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid #2b2e35;background:#111318;border-radius:9px;color:#e3e5e9;font-size:12px;margin:8px 0 12px}
+.base44App .pageDot{width:7px;height:7px;border-radius:50%;background:#8b7cff;box-shadow:0 0 0 3px rgba(139,124,255,.12)}
+.base44App.light,.base44App.dark.light{--ed-bg:#09090b!important;--ed-panel:#101114!important;--ed-panel2:#15161a!important;--ed-border:#272a30!important;--ed-muted:#8d929d!important;--ed-text:#f4f5f7!important;background:#09090b!important;color:#f4f5f7!important}
+.base44App.light .b44Top,.base44App.light .b44Left,.base44App.light .b44Canvas,.base44App.light .canvasToolbar,.base44App.light .codeTabs,.base44App.light .b44Chat,.base44App.light .b44Inspector{background:#0d0f12!important;color:#f4f5f7!important}
