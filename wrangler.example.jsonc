@@ -3,10 +3,9 @@
   "name": "gutheb-workers",
   "pages_build_output_dir": "./dist",
   "d1_databases": [
-    {
-      "binding": "GUTHEB_DB",
-      "database_name": "REPLACE_WITH_SHARED_GUTHEB_D1_NAME",
-      "database_id": "REPLACE_WITH_SHARED_GUTHEB_D1_ID"
-    }
+    {"binding":"USERS_DB","database_name":"users","database_id":"REPLACE_WITH_USERS_D1_ID"},
+    {"binding":"REPOS_DB","database_name":"repos","database_id":"REPLACE_WITH_REPOS_D1_ID"},
+    {"binding":"ARCHIVE_DB","database_name":"archivecontent","database_id":"REPLACE_WITH_ARCHIVECONTENT_D1_ID"},
+    {"binding":"REPOZIP_DB","database_name":"zip","database_id":"REPLACE_WITH_ZIP_D1_ID"}
   ]
 }
