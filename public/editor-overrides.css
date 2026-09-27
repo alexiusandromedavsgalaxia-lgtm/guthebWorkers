@@ -53,3 +53,21 @@
 .base44App.light .b44Left{background:#f5f6f8!important}
 .base44App.light .b44Inspector,.base44App.light .b44Chat{background:#fff!important}
 @media(max-width:900px){.base44App .b44Body{grid-template-columns:58px minmax(0,1fr)!important}.base44App .b44Chat,.base44App .b44Inspector{position:absolute;z-index:20;left:58px;top:58px;bottom:0;width:min(330px,calc(100vw - 58px));box-shadow:20px 0 60px rgba(0,0,0,.35)}.base44App .b44Left{width:58px!important}.base44App .b44Left button{width:42px!important}.base44App .b44Project{display:none!important}.base44App .b44TopActions button{padding:0 7px!important}.base44App .largePreview{min-width:620px!important}}
+
+.base44App .panelGroup{position:relative}
+.base44App .panelTrigger{min-width:78px!important;background:#17191d!important;border-color:#2c2f36!important;color:#f2f3f5!important;font-weight:650!important}
+.base44App .panelTrigger span{margin-left:5px;color:#8d929d}
+.base44App .panelPopover{position:absolute;right:0;top:42px;z-index:80;width:150px;padding:6px;background:#111318;border:1px solid #30343b;border-radius:11px;box-shadow:0 18px 55px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:3px}
+.base44App .panelPopover button{width:100%!important;height:34px!important;text-align:left!important;border:0!important;border-radius:7px!important;background:transparent!important;color:#dfe2e7!important;padding:0 10px!important}
+.base44App .panelPopover button:hover{background:#1d2025!important;color:#fff!important}
+.base44App .appPreview{height:100%;display:flex;flex-direction:column;background:#08090b}
+.base44App .previewToolbar{height:48px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid #272a30;background:#0d0f12;color:#dfe2e7}
+.base44App .previewToolbar>span{font-size:12px;font-weight:650;letter-spacing:.02em}
+.base44App .previewToolbar button{height:32px;padding:0 9px;border:1px solid transparent;border-radius:8px;background:transparent;color:#8e949f}
+.base44App .previewToolbar button:hover{background:#191b20;border-color:#2d3037;color:#fff}
+.base44App .previewStage{flex:1;min-height:0;padding:24px;display:flex;align-items:stretch;justify-content:center;background:#0a0b0d;background-image:radial-gradient(#22252b 1px,transparent 1px);background-size:20px 20px;overflow:auto}
+.base44App .previewBrowser{width:min(1280px,100%);height:34px;flex:none;display:flex;align-items:center;gap:10px;padding:0 11px;border:1px solid #30343b;border-bottom:0;border-radius:11px 11px 0 0;background:#15171b;color:#8f95a0;font-size:11px}
+.base44App .previewDots{display:flex;gap:5px}.base44App .previewDots i{width:7px;height:7px;border-radius:50%;background:#555a63}
+.base44App .previewStage{position:relative}.base44App .previewBrowser{position:absolute;top:24px;left:24px;right:24px;width:auto}
+.base44App .previewStage iframe{width:min(1280px,100%);margin-top:34px;min-height:calc(100% - 34px);border:1px solid #30343b;border-radius:0 0 11px 11px;background:#fff;box-shadow:0 22px 70px rgba(0,0,0,.45)}
+@media(max-width:900px){.base44App .panelPopover{right:-8px}.base44App .previewStage{padding:16px}.base44App .previewBrowser{top:16px;left:16px;right:16px}.base44App .previewStage iframe{margin-top:34px}}
