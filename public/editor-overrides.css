@@ -45,3 +45,9 @@
 .repoFileRow code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace!important;overflow:hidden!important;text-overflow:ellipsis!important}
 .repoFileRow>span:last-child{color:#737a86!important;font-size:11px!important}
 .base44App.light{filter:none!important}
+
+/* Workers editor is intentionally dark-only. */
+.base44App.light{--ed-bg:#09090b!important;--ed-panel:#101114!important;--ed-panel2:#15161a!important;--ed-border:#272a30!important;--ed-muted:#8d929d!important;--ed-text:#f4f5f7!important;background:#09090b!important;color:#f4f5f7!important}
+.base44App.light .b44Top,.base44App.light .b44Left,.base44App.light .b44Canvas,.base44App.light .canvasToolbar,.base44App.light .codeTabs,.base44App.light .b44Inspector,.base44App.light .b44Chat{background:inherit!important;color:#f4f5f7!important;border-color:#272a30!important}
+.base44App .b44TopActions button:nth-child(4){display:none!important}
+.base44App .b44TopActions .publish{background:#fff!important;color:#09090b!important}
