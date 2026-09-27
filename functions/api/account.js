@@ -19,9 +19,26 @@ async function userFrom(request,env){
   const tokenHash=await sha(m[1]);return await users.prepare("SELECT u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,new Date().toISOString()).first();
 }
 async function read(request){try{return await request.json()}catch{return {}}}
+async function ensureSchemas(env){
+  const {users,repos}=dbs(env);
+  if(!users||!repos)throw new Error("USERS_DB and REPOS_DB must be bound.");
+  await users.batch([
+    users.prepare("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY,username TEXT NOT NULL UNIQUE,email TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,created_at TEXT NOT NULL)"),
+    users.prepare("CREATE TABLE IF NOT EXISTS profiles (user_id TEXT PRIMARY KEY,username TEXT NOT NULL,bio TEXT NOT NULL DEFAULT '',location TEXT NOT NULL DEFAULT '',website TEXT NOT NULL DEFAULT '',avatar TEXT NOT NULL DEFAULT '')"),
+    users.prepare("CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL,expires_at TEXT NOT NULL)")
+  ]);
+  await repos.batch([
+    repos.prepare("CREATE TABLE IF NOT EXISTS repos (id TEXT PRIMARY KEY,owner_id TEXT NOT NULL,name TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',visibility TEXT NOT NULL DEFAULT 'Public',language TEXT NOT NULL DEFAULT '',license TEXT NOT NULL DEFAULT 'MIT',stars INTEGER NOT NULL DEFAULT 0,forks INTEGER NOT NULL DEFAULT 0,updated_at TEXT NOT NULL)"),
+    repos.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_repos_owner_name ON repos(owner_id,name)"),
+    repos.prepare("CREATE TABLE IF NOT EXISTS repo_files (repo_id TEXT NOT NULL,path TEXT NOT NULL,content TEXT NOT NULL DEFAULT '',PRIMARY KEY(repo_id,path))"),
+    repos.prepare("CREATE TABLE IF NOT EXISTS repo_folders (repo_id TEXT NOT NULL,path TEXT NOT NULL,PRIMARY KEY(repo_id,path))")
+  ]);
+}
+
 export async function onRequestPost({request,env}){
   const {users,repos,archive,zip}=dbs(env);
   if(!users||!repos)return json({error:"USERS_DB and REPOS_DB must be bound to this Pages project."},503);
+  try{await ensureSchemas(env)}catch(e){return json({error:"D1 schema initialization failed: "+e.message},503)}
   const b=await read(request),action=String(b.action||"");
   if(action==="register"||action==="login"){
     const email=String(b.email||"").trim().toLowerCase(),password=String(b.password||""),username=String(b.username||email.split("@")[0]||"user").trim();
@@ -93,6 +110,7 @@ export async function onRequestPost({request,env}){
 }
 export async function onRequestGet({request,env}){
   const {users}=dbs(env);if(!users)return json({error:"USERS_DB must be bound to this Pages project."},503);
+  try{await ensureSchemas(env)}catch(e){return json({error:"D1 schema initialization failed: "+e.message},503)}
   const user=await userFrom(request,env);if(!user)return json({error:"Not authenticated."},401);
   const p=await users.prepare("SELECT * FROM profiles WHERE user_id=?").bind(user.id).first();return json({user:{id:user.id,name:user.username,email:user.email},profile:p});
 }
