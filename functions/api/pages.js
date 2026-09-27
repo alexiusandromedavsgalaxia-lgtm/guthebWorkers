@@ -11,8 +11,18 @@ async function userFrom(request,env){
 }
 async function read(request){try{return await request.json()}catch{return {}}}
 const slug=s=>String(s||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,80)||"site";
+async function ensurePagesSchema(pages){
+  await pages.batch([
+    pages.prepare("CREATE TABLE IF NOT EXISTS page_projects (id TEXT PRIMARY KEY,owner_id TEXT NOT NULL,name TEXT NOT NULL,slug TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL,updated_at TEXT NOT NULL)"),
+    pages.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_page_projects_owner_slug ON page_projects(owner_id,slug)"),
+    pages.prepare("CREATE TABLE IF NOT EXISTS page_files (project_id TEXT NOT NULL,path TEXT NOT NULL,content TEXT NOT NULL DEFAULT '',mime TEXT NOT NULL DEFAULT 'text/plain',updated_at TEXT NOT NULL,PRIMARY KEY(project_id,path))"),
+    pages.prepare("CREATE TABLE IF NOT EXISTS compilation_logos (id TEXT PRIMARY KEY,project_id TEXT NOT NULL,filename TEXT NOT NULL,mime TEXT NOT NULL,data TEXT NOT NULL,created_at TEXT NOT NULL)"),
+    pages.prepare("CREATE TABLE IF NOT EXISTS page_deployments (id TEXT PRIMARY KEY,project_id TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'draft',url TEXT NOT NULL DEFAULT '',metadata TEXT NOT NULL DEFAULT '{}',created_at TEXT NOT NULL)")
+  ]);
+}
 export async function onRequestPost({request,env}){
   const pages=db(env);if(!pages)return json({error:"WORKERS_PAGES_DB is not bound."},503);
+  try{await ensurePagesSchema(pages)}catch(e){return json({error:"workers-pages schema initialization failed: "+e.message},503)}
   const user=await userFrom(request,env);if(!user)return json({error:"Not authenticated."},401);
   const b=await read(request),action=String(b.action||"");
   if(action==="project"){
