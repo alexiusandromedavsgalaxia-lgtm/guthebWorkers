@@ -1,5 +1,7 @@
-FORCE CLOUDFLARE REBUILD 2026-09-27T19:20:13.871Z
-Interface: Base44-style Build/Code canvas
-D1: USERS_DB=users REPOS_DB=repos ARCHIVE_DB=archivecontent REPOZIP_DB=zip WORKERS_PAGES_DB=workers-pages
-Functions: account,pages,ai
-Do not skip this commit.
+CLOUDFLARE FORCE REBUILD • 1790536847149
+Base44-style Workers UI + separate D1 bindings
+USERS_DB=users
+REPOS_DB=repos
+ARCHIVE_DB=archivecontent
+REPOZIP_DB=zip
+WORKERS_PAGES_DB=workers-pages
