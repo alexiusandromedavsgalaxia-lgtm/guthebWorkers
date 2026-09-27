@@ -1,5 +1,5 @@
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{"Content-Type":"application/json","Cache-Control":"no-store"}});
-const db=env=>env.WORKERS_PAGES_DB||env.workersPages||env.WORKERS_PAGES||null;
+const db=env=>env.pages||null;
 const enc=new TextEncoder();
 const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
 async function sha(s){return hex(await crypto.subtle.digest("SHA-256",enc.encode(s)))}
@@ -21,7 +21,7 @@ async function ensurePagesSchema(pages){
   ]);
 }
 export async function onRequestPost({request,env}){
-  const pages=db(env);if(!pages)return json({error:"WORKERS_PAGES_DB is not bound."},503);
+  const pages=db(env);if(!pages)return json({error:"D1 binding 'pages' is not available."},503);
   try{await ensurePagesSchema(pages)}catch(e){return json({error:"workers-pages schema initialization failed: "+e.message},503)}
   const user=await userFrom(request,env);if(!user)return json({error:"Not authenticated."},401);
   const b=await read(request),action=String(b.action||"");
@@ -51,7 +51,7 @@ export async function onRequestPost({request,env}){
   return json({error:"Unknown action."},400);
 }
 export async function onRequestGet({request,env}){
-  const pages=db(env);if(!pages)return json({error:"WORKERS_PAGES_DB is not bound."},503);
+  const pages=db(env);if(!pages)return json({error:"D1 binding 'pages' is not available."},503);
   const user=await userFrom(request,env);if(!user)return json({error:"Not authenticated."},401);
   const projectId=new URL(request.url).searchParams.get("project");
   if(projectId){
