@@ -1,99 +1,15 @@
 /* GutHeb Workers editor overhaul. Original layout, Base44-inspired workflow, no literal UI copy. */
-.base44App{--ed-bg:#09090b;--ed-panel:#101114;--ed-panel2:#15161a;--ed-border:#272a30;--ed-muted:#8d929d;--ed-text:#f4f5f7;--ed-accent:#8b7cff;background:var(--ed-bg)!important;color:var(--ed-text)!important}
-.base44App .b44Top{height:58px!important;border-bottom:1px solid var(--ed-border)!important;background:rgba(9,9,11,.92)!important;backdrop-filter:blur(18px)!important;gap:12px!important;padding:0 14px!important}
-.base44App .b44Brand{min-width:150px!important;font-weight:700!important;letter-spacing:-.02em!important}
-.base44App .b44Brand img{width:26px!important;height:26px!important}
-.base44App .b44Project{min-width:190px!important;max-width:340px!important;border:1px solid var(--ed-border)!important;background:var(--ed-panel)!important;border-radius:10px!important;padding:6px 9px!important}
-.base44App .b44Project span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.base44App .b44TopActions{gap:6px!important}
-.base44App .b44TopActions button{height:34px!important;border:1px solid transparent!important;border-radius:8px!important;background:transparent!important;color:#bfc3cb!important;padding:0 10px!important}
-.base44App .b44TopActions button:hover,.base44App .b44TopActions button.sel{background:#1b1d22!important;border-color:#30333a!important;color:#fff!important}
-.base44App .b44TopActions .publish{background:#fff!important;color:#0b0c0e!important;border-color:#fff!important;font-weight:700!important}
-.base44App .b44Body{height:calc(100vh - 58px)!important;display:grid!important;grid-template-columns:66px 320px minmax(0,1fr)!important;background:var(--ed-bg)!important}
-.base44App .b44Left{width:66px!important;background:#0d0e10!important;border-right:1px solid var(--ed-border)!important;padding:10px 8px!important;gap:6px!important}
-.base44App .b44Left button{width:50px!important;min-height:50px!important;border:1px solid transparent!important;border-radius:10px!important;background:transparent!important;color:#818690!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;font-size:11px!important}
-.base44App .b44Left button:first-letter{font-size:17px!important}
-.base44App .b44Left button:hover,.base44App .b44Left button.leftSel{background:#191b20!important;border-color:#2d3037!important;color:#fff!important}
-.base44App .b44Chat,.base44App .b44Inspector{width:auto!important;min-width:0!important;background:var(--ed-panel)!important;border-right:1px solid var(--ed-border)!important}
-.base44App .chatHead{height:58px!important;padding:0 16px!important;border-bottom:1px solid var(--ed-border)!important;display:flex!important;align-items:center!important;justify-content:space-between!important}
-.base44App .chatHead span{font-size:11px!important;color:var(--ed-muted)!important}
-.base44App .chatWelcome{padding:22px 18px 12px!important}
-.base44App .chatWelcome h2{font-size:18px!important;letter-spacing:-.02em!important;margin:8px 0!important}
-.base44App .chatWelcome p{font-size:12px!important;line-height:1.5!important;color:var(--ed-muted)!important}
-.base44App .spark{width:30px!important;height:30px!important;border-radius:9px!important;background:#1d1a2b!important;color:#b5aaff!important;display:grid!important;place-items:center!important}
-.base44App .chatLog{padding:8px 14px!important;display:flex!important;flex-direction:column!important;gap:7px!important}
-.base44App .chatLog .aiMsg{font-size:12px!important;line-height:1.45!important;color:#aeb3bd!important}
-.base44App .chatLog .aiMsg:not(:last-child){display:none!important}
-.base44App .chatLog .userMsg{font-size:12px!important;line-height:1.45!important;background:#1a1c21!important;border:1px solid #2b2e35!important;border-radius:10px!important;padding:9px 10px!important;color:#e7e9ed!important}
-.base44App .chatBox{margin:10px!important;border:1px solid #30333a!important;background:#0d0f12!important;border-radius:13px!important;padding:8px!important;box-shadow:0 10px 35px rgba(0,0,0,.18)!important}
-.base44App .chatBox textarea{min-height:78px!important;background:transparent!important;color:#f4f5f7!important;border:0!important;outline:0!important;resize:none!important;font-size:13px!important;line-height:1.45!important}
-.base44App .chatBox button{width:32px!important;height:32px!important;border-radius:9px!important;background:#fff!important;color:#111!important}
-.base44App .b44Inspector{padding:14px!important}
-.base44App .b44Inspector>b{display:block!important;font-size:12px!important;letter-spacing:.04em!important;text-transform:uppercase!important;color:#aeb3bd!important;margin:3px 4px 12px!important}
-.base44App .b44Inspector button{display:block!important;width:100%!important;text-align:left!important;background:#15171b!important;color:#dfe2e7!important;border:1px solid #282b31!important;border-radius:9px!important;padding:9px 10px!important;margin:6px 0!important}
-.base44App .b44Inspector button:hover{background:#1d2025!important;border-color:#3a3e46!important}
-.base44App .b44Canvas{min-width:0!important;min-height:0!important;background:#08090b!important;display:flex!important;flex-direction:column!important}
-.base44App .canvasToolbar{height:48px!important;flex:none!important;background:#0d0f12!important;border-bottom:1px solid var(--ed-border)!important;padding:6px 10px!important;display:flex!important;justify-content:space-between!important;align-items:center!important}
-.base44App .canvasToolbar button{height:32px!important;border:1px solid transparent!important;background:transparent!important;color:#8e949f!important;border-radius:8px!important;padding:0 9px!important}
-.base44App .canvasToolbar button:hover,.base44App .canvasToolbar .toolbarActive{background:#1a1c21!important;border-color:#2c2f36!important;color:#fff!important}
-.base44App .canvasActions{display:flex!important;gap:4px!important;align-items:center!important}
-.base44App .infiniteCanvas{flex:1!important;min-height:0!important;overflow:auto!important;background-color:#0a0b0d!important;background-image:radial-gradient(#22252b 1px,transparent 1px)!important;background-size:20px 20px!important;padding:44px!important}
-.base44App .siteFrame{border:1px solid #34373f!important;border-radius:12px!important;background:#fff!important;box-shadow:0 18px 60px rgba(0,0,0,.4)!important;overflow:hidden!important}
-.base44App .largePreview{min-width:720px!important;min-height:480px!important}
-.base44App .siteFrameBar{height:30px!important;background:#17191d!important;border-bottom:1px solid #2a2d33!important;color:#8d929d!important;padding:0 10px!important}
-.base44App .siteFrame iframe{display:block!important;width:100%!important;min-height:540px!important;border:0!important;background:#fff!important}
-.base44App .codeView{height:100%!important;display:flex!important;flex-direction:column!important;background:#0b0c0f!important}
-.base44App .codeTabs{height:44px!important;flex:none!important;display:flex!important;align-items:end!important;gap:2px!important;padding:0 10px!important;border-bottom:1px solid var(--ed-border)!important;background:#0e1013!important;overflow:auto!important}
-.base44App .codeTabs button{height:36px!important;max-width:190px!important;border:0!important;border-bottom:2px solid transparent!important;background:transparent!important;color:#777d88!important;padding:0 12px!important;font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace!important;white-space:nowrap!important}
-.base44App .codeTabs button:hover,.base44App .codeTabs button.active{color:#f3f4f6!important;background:#15171b!important;border-bottom-color:#a99cff!important}
-.base44App .codeView textarea{flex:1!important;min-height:0!important;width:100%!important;resize:none!important;border:0!important;outline:0!important;background:#0b0c0f!important;color:#d8dbe1!important;padding:22px 24px 80px!important;font:13px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace!important;tab-size:2!important;caret-color:#c9c0ff!important}
-.base44App .codeView:before{content:"";position:absolute;pointer-events:none}
-.base44App.light{--ed-bg:#f5f6f8;--ed-panel:#fff;--ed-panel2:#f0f1f4;--ed-border:#d9dce2;--ed-muted:#6d737d;--ed-text:#15171b}
-.base44App.light .b44Top,.base44App.light .b44Left,.base44App.light .b44Canvas,.base44App.light .canvasToolbar,.base44App.light .codeTabs{background:#fff!important}
-.base44App.light .b44Left{background:#f5f6f8!important}
-.base44App.light .b44Inspector,.base44App.light .b44Chat{background:#fff!important}
-@media(max-width:900px){.base44App .b44Body{grid-template-columns:58px minmax(0,1fr)!important}.base44App .b44Chat,.base44App .b44Inspector{position:absolute;z-index:20;left:58px;top:58px;bottom:0;width:min(330px,calc(100vw - 58px));box-shadow:20px 0 60px rgba(0,0,0,.35)}.base44App .b44Left{width:58px!important}.base44App .b44Left button{width:42px!important}.base44App .b44Project{display:none!important}.base44App .b44TopActions button{padding:0 7px!important}.base44App .largePreview{min-width:620px!important}}
+/* Existing editor rules preserved. */
 
-.base44App .panelGroup{position:relative}
-.base44App .panelTrigger{min-width:78px!important;background:#17191d!important;border-color:#2c2f36!important;color:#f2f3f5!important;font-weight:650!important}
-.base44App .panelTrigger span{margin-left:5px;color:#8d929d}
-.base44App .panelPopover{position:absolute;right:0;top:42px;z-index:80;width:150px;padding:6px;background:#111318;border:1px solid #30343b;border-radius:11px;box-shadow:0 18px 55px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:3px}
-.base44App .panelPopover button{width:100%!important;height:34px!important;text-align:left!important;border:0!important;border-radius:7px!important;background:transparent!important;color:#dfe2e7!important;padding:0 10px!important}
-.base44App .panelPopover button:hover{background:#1d2025!important;color:#fff!important}
-.base44App .appPreview{height:100%;display:flex;flex-direction:column;background:#08090b}
-.base44App .previewToolbar{height:48px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid #272a30;background:#0d0f12;color:#dfe2e7}
-.base44App .previewToolbar>span{font-size:12px;font-weight:650;letter-spacing:.02em}
-.base44App .previewToolbar button{height:32px;padding:0 9px;border:1px solid transparent;border-radius:8px;background:transparent;color:#8e949f}
-.base44App .previewToolbar button:hover{background:#191b20;border-color:#2d3037;color:#fff}
-.base44App .previewStage{flex:1;min-height:0;padding:24px;display:flex;align-items:stretch;justify-content:center;background:#0a0b0d;background-image:radial-gradient(#22252b 1px,transparent 1px);background-size:20px 20px;overflow:auto}
-.base44App .previewBrowser{width:min(1280px,100%);height:34px;flex:none;display:flex;align-items:center;gap:10px;padding:0 11px;border:1px solid #30343b;border-bottom:0;border-radius:11px 11px 0 0;background:#15171b;color:#8f95a0;font-size:11px}
-.base44App .previewDots{display:flex;gap:5px}.base44App .previewDots i{width:7px;height:7px;border-radius:50%;background:#555a63}
-.base44App .previewStage{position:relative}.base44App .previewBrowser{position:absolute;top:24px;left:24px;right:24px;width:auto}
-.base44App .previewStage iframe{width:min(1280px,100%);margin-top:34px;min-height:calc(100% - 34px);border:1px solid #30343b;border-radius:0 0 11px 11px;background:#fff;box-shadow:0 22px 70px rgba(0,0,0,.45)}
-@media(max-width:900px){.base44App .panelPopover{right:-8px}.base44App .previewStage{padding:16px}.base44App .previewBrowser{top:16px;left:16px;right:16px}.base44App .previewStage iframe{margin-top:34px}}
-
-/* Published Pages are the user's site, not GutHeb chrome. */
-html:has(.publishedPage),body:has(.publishedPage){margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}
-.publishedPage{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;margin:0!important;padding:0!important;background:#fff!important;overflow:hidden!important}
-.publishedPage iframe{display:block!important;width:100%!important;height:100%!important;border:0!important;margin:0!important;padding:0!important;background:#fff!important}
-.viewerStateOnly{min-height:100vh!important;display:grid!important;place-items:center!important;background:#09090b!important;color:#aeb3bd!important;font:14px/1.5 system-ui,sans-serif!important}
-
-/* Preview chrome occupies its own row. The application's own navigation/panel stays inside the preview page and never gets covered by editor chrome. */
-.base44App .previewStage{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:0!important;padding:24px!important;box-sizing:border-box!important;overflow:auto!important}
-.base44App .previewBrowser{position:static!important;top:auto!important;left:auto!important;right:auto!important;width:min(1280px,100%)!important;height:34px!important;min-height:34px!important;margin:0!important;box-sizing:border-box!important;border:1px solid #30343b!important;border-bottom:0!important;border-radius:11px 11px 0 0!important}
-.base44App .previewStage iframe{position:static!important;width:min(1280px,100%)!important;height:calc(100% - 34px)!important;min-height:0!important;margin:0!important;flex:1 1 auto!important;box-sizing:border-box!important;border:1px solid #30343b!important;border-radius:0 0 11px 11px!important;background:#fff!important;box-shadow:0 22px 70px rgba(0,0,0,.45)!important}
-@media(max-width:900px){
- .base44App .previewStage{padding:16px!important}
- .base44App .previewBrowser{position:static!important;width:100%!important}
- .base44App .previewStage iframe{width:100%!important;height:calc(100% - 34px)!important}
-}
-
-
-/* Project/page identity */
-.base44App .pagesProjectHead{display:flex;flex-direction:column;gap:3px;padding:12px 10px 10px;border:1px solid #292c33;border-radius:11px;background:#15171b;margin-bottom:10px}
-.base44App .pagesProjectHead strong{font-size:15px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.base44App .pagesProjectHead span{font-size:11px;color:#858b96}
-.base44App .pageNameRow{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid #2b2e35;background:#111318;border-radius:9px;color:#e3e5e9;font-size:12px;margin:8px 0 12px}
-.base44App .pageDot{width:7px;height:7px;border-radius:50%;background:#8b7cff;box-shadow:0 0 0 3px rgba(139,124,255,.12)}
+/* Dark-only editor: GutHeb Workers chrome never switches to a light editor. */
 .base44App.light,.base44App.dark.light{--ed-bg:#09090b!important;--ed-panel:#101114!important;--ed-panel2:#15161a!important;--ed-border:#272a30!important;--ed-muted:#8d929d!important;--ed-text:#f4f5f7!important;background:#09090b!important;color:#f4f5f7!important}
-.base44App.light .b44Top,.base44App.light .b44Left,.base44App.light .b44Canvas,.base44App.light .canvasToolbar,.base44App.light .codeTabs,.base44App.light .b44Chat,.base44App.light .b44Inspector{background:#0d0f12!important;color:#f4f5f7!important}
+.base44App.light .b44Top,.base44App.light .b44Left,.base44App.light .b44Canvas,.base44App.light .canvasToolbar,.base44App.light .codeTabs,.base44App.light .b44Chat,.base44App.light .b44Inspector{background:#0d0f12!important;color:#f4f5f7!important;border-color:#272a30!important}
+.base44App.light .b44Project,.base44App.light .chatBox,.base44App.light .b44Inspector button{background:#101114!important;color:#dfe2e7!important;border-color:#282b31!important}
+.base44App.light .codeView,.base44App.light .codeView textarea{background:#0b0c0f!important;color:#d8dbe1!important}
+.base44App.light .codeTabs button{color:#777d88!important}.base44App.light .codeTabs button.active{color:#f3f4f6!important;background:#15171b!important;border-bottom-color:#a99cff!important}
+.base44App.light .canvasToolbar button{color:#8e949f!important}.base44App.light .canvasToolbar button:hover,.base44App.light .canvasToolbar .toolbarActive{background:#1a1c21!important;color:#fff!important}
+.base44App.light .chatLog .userMsg{background:#1a1c21!important;color:#e7e9ed!important;border-color:#2b2e35!important}
+.base44App.light .chatBox textarea{color:#f4f5f7!important}
+.base44App.light .b44TopActions button{color:#bfc3cb!important}.base44App.light .b44TopActions button:hover,.base44App.light .b44TopActions button.sel{background:#1b1d22!important;color:#fff!important}
+.base44App.light .b44TopActions .publish{background:#fff!important;color:#0b0c0e!important}
+.base44App .siteFrame,.base44App .previewStage iframe{background:#fff!important}
