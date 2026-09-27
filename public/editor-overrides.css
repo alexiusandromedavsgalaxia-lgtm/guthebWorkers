@@ -71,3 +71,9 @@
 .base44App .previewStage{position:relative}.base44App .previewBrowser{position:absolute;top:24px;left:24px;right:24px;width:auto}
 .base44App .previewStage iframe{width:min(1280px,100%);margin-top:34px;min-height:calc(100% - 34px);border:1px solid #30343b;border-radius:0 0 11px 11px;background:#fff;box-shadow:0 22px 70px rgba(0,0,0,.45)}
 @media(max-width:900px){.base44App .panelPopover{right:-8px}.base44App .previewStage{padding:16px}.base44App .previewBrowser{top:16px;left:16px;right:16px}.base44App .previewStage iframe{margin-top:34px}}
+
+/* Published Pages are the user's site, not GutHeb chrome. */
+html:has(.publishedPage),body:has(.publishedPage){margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}
+.publishedPage{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;margin:0!important;padding:0!important;background:#fff!important;overflow:hidden!important}
+.publishedPage iframe{display:block!important;width:100%!important;height:100%!important;border:0!important;margin:0!important;padding:0!important;background:#fff!important}
+.viewerStateOnly{min-height:100vh!important;display:grid!important;place-items:center!important;background:#09090b!important;color:#aeb3bd!important;font:14px/1.5 system-ui,sans-serif!important}
