@@ -114,8 +114,7 @@ function Builder({files,setFiles,project,setProject,projectId,setProjectId,accou
  const[mobileOpen,setMobileOpen]=useState(false);
  const[activeFile,setActiveFile]=useState("index.html");
 
- const html=files["index.html"]||"<h1>no index.html</h1>";
- const fileNames=Object.keys(files).sort();
+ const html=files[page]||files["index.html"]||"<h1>no index.html</h1>";
  const preview=useMemo(()=>injectPreview(html),[html,previewKey]);
 
  const save=async(nextFiles=files)=>{
@@ -227,9 +226,15 @@ function CodeDrawer({files,active,setActive,value,onChange,onSave}){
 function PublishedPage(){
  const[id]=useState(()=>decodeURIComponent(location.pathname.split("/")[2]||""));
  const[status,setStatus]=useState("loading…"),[html,setHtml]=useState("");
- useEffect(()=>{fetch("/api/deployment/"+encodeURIComponent(id)).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||"not found");setHtml((d.files||[]).find(x=>x.path==="index.html")?.content||"");setStatus("")}).catch(e=>setStatus(e.message))},[id]);
+ useEffect(()=>{fetch("/api/deployment/"+encodeURIComponent(id)).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||"not found");setHtml(injectPublished((d.files||[]).find(x=>x.path==="index.html")?.content||"",location.origin+"/pages/"+encodeURIComponent(id)+"/"));setStatus("")}).catch(e=>setStatus(e.message))},[id]);
  if(status)return <div className="publishedState">{status}</div>;
  return <iframe className="publishedFrame" title="published app" srcDoc={html}/>;
+}
+
+function injectPublished(source,base){
+ let html=injectPreview(source);
+ if(!/<base\s/i.test(html))html=html.replace(/<head>/i,`<head><base href="${base}">`);
+ return html;
 }
 
 function injectPreview(source){
