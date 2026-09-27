@@ -30,7 +30,7 @@ const ask=async()=>{const q=ai.trim();if(!q)return;setAi("");setLog(x=>[...x,"TÃ
  const startProject=()=>{if(!account){go("login");return}setMode("builder");history.replaceState(null,"","/builder")};
  if(mode==="login"||mode==="register"||mode==="reset")return <AuthModal mode={authMode} setMode={go} form={authForm} setForm={setAuthForm} error={accountError} onSubmit={accountAction}/>;
  if(mode==="home")return <Home account={account} project={project} setProject={setProject} onStart={startProject} onLogin={()=>go("login")} onRegister={()=>go("register")}/>;
- return <Builder theme={theme} setTheme={setTheme} repoId={repoId} account={account} project={project} setProject={setProject} files={files} setFiles={setFiles} active={active} setActive={setActive} ai={ai} setAi={setAi} log={log} setLog={setLog} panel={panel} setPanel={setPanel} view={view} setView={setView} update={update} addFile={addFile} addFolder={addFolder} savePages={savePages} busy={busy} ask={ask}/>;
+ return <Builder theme={theme} setTheme={setTheme} repoId={repoId} account={account} project={project} setProject={setProject} files={files} setFiles={setFiles} active={active} setActive={setActive} ai={ai} setAi={setAi} log={log} setLog={setLog} panel={panel} setPanel={setPanel} view={view} setView={setView} update={update} addFile={addFile} addFolder={addFolder} savePages={savePages} busy={busy} ask={ask} runTests={runTests}/>;
 }
 
 
