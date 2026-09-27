@@ -1,69 +1,247 @@
-import React,{useEffect,useState}from"react";
+import React,{useEffect,useMemo,useState}from"react";
 import{createRoot}from"react-dom/client";
 import"./styles.css";
 
-const starter={"index.html":"<!doctype html>\n<html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>GutHeb Space</title></head><body><main><h1>Hello GutHeb Workers</h1><p>Edit this project and deploy it.</p></main></body></html>","src/main.js":"document.body.dataset.runtime=\"web-native\";"};
-const clean=s=>s.replace(/[^a-zA-Z0-9._-]/g,"-").replace(/-+/g,"-").slice(0,48)||"gutheb-space";
+const starter={
+ "index.html":`<!doctype html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GutHeb app</title></head>
+<body><main><h1>your new app</h1><p>describe a change in the chat to get started</p></main></body>
+</html>`,
+ "src/main.js":"document.documentElement.dataset.gutheb='true';"
+};
 
-function PagesViewer(){
- const[id]=useState(()=>decodeURIComponent(location.hash.replace(/^#/,"")));
- const[status,setStatus]=useState("Cargando publicación…"),[html,setHtml]=useState("");
- useEffect(()=>{if(!id){setStatus("Falta el ID de publicación.");return}
- fetch("/api/deployment/"+encodeURIComponent(id)).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||"No se encontró la publicación.");const index=(d.files||[]).find(x=>x.path==="index.html");setHtml(index?.content||"");setStatus("")}).catch(e=>setStatus(e.message))
- },[id]);
- if(status)return <div className="viewer viewerStateOnly">{status}</div>;
- return <main className="publishedPage"><iframe title="Published page" sandbox="allow-scripts allow-forms allow-modals allow-popups" srcDoc={html}/></main>
+const icon=(name)=><span className="ico" aria-hidden="true">{name}</span>;
+
+function useProject(){
+ const[files,setFiles]=useState(()=>{try{return JSON.parse(localStorage.getItem("ghw-files")||"null")||starter}catch{return starter}});
+ const[project,setProject]=useState(()=>localStorage.getItem("ghw-project")||"untitled app");
+ const[projectId,setProjectId]=useState(()=>localStorage.getItem("ghw-project-id")||null);
+ const[account,setAccount]=useState(null);
+ const[repos,setRepos]=useState([]);
+ const[busy,setBusy]=useState(false);
+ useEffect(()=>localStorage.setItem("ghw-files",JSON.stringify(files)),[files]);
+ useEffect(()=>localStorage.setItem("ghw-project",project),[project]);
+ return{files,setFiles,project,setProject,projectId,setProjectId,account,setAccount,repos,setRepos,busy,setBusy};
 }
 
 function App(){
- const[mode,setMode]=useState(()=>location.pathname.startsWith("/builder/")||location.pathname==="/builder"?"builder":location.pathname.startsWith("/repo/")?"repo":location.pathname==="/signup"?"register":location.pathname==="/reset-password"?"reset":"login"),[theme,setTheme]=useState(()=>localStorage.getItem("ghw-theme")||"dark");
- const[files,setFiles]=useState(()=>JSON.parse(localStorage.getItem("ghw-files")||"null")||starter),[active,setActive]=useState("index.html"),[project,setProject]=useState(()=>localStorage.getItem("ghw-project")||"untitled-space"),[repos,setRepos]=useState([]),[ai,setAi]=useState(""),[log,setLog]=useState([]),[panel,setPanel]=useState("chat"),[view,setView]=useState("canvas"),[account,setAccount]=useState(null),[authMode,setAuthMode]=useState(()=>location.pathname==="/signup"?"register":location.pathname==="/reset-password"?"reset":"login"),[authForm,setAuthForm]=useState({username:"",email:"",password:""}),[accountError,setAccountError]=useState(""),[busy,setBusy]=useState(false),[repoId,setRepoId]=useState(null);
- useEffect(()=>localStorage.setItem("ghw-files",JSON.stringify(files)),[files]);useEffect(()=>localStorage.setItem("ghw-project",project),[project]);useEffect(()=>localStorage.setItem("ghw-theme",theme),[theme]);
- useEffect(()=>{fetch("/api/account",{credentials:"include"}).then(async r=>r.ok?r.json():null).then(async d=>{if(d&&d.user){setAccount(d.user);const mr=await fetch("/api/account",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"me"})});if(mr.ok){const md=await mr.json();setRepos(md.repos||[])}const pr=await fetch("/api/pages",{credentials:"include"});if(pr.ok){const pd=await pr.json();const first=(pd.projects||[])[0];if(first){const detail=await fetch("/api/pages?project="+encodeURIComponent(first.id),{credentials:"include"});if(detail.ok){const full=await detail.json();const next={};for(const row of(full.files||[]))next[row.path]=row.content;setRepoId(first.id);setProject(first.name);if(Object.keys(next).length)setFiles(next);}}}setMode(location.pathname.startsWith("/builder")?"builder":location.pathname.startsWith("/repo/")?"repo":"home")}}).catch(()=>{})},[]);
- const go=m=>{setAuthMode(m);setAccountError("");const path=m==="register"?"/signup":m==="reset"?"/reset-password":"/login";history.replaceState(null,"",path);setMode(m)};
- const accountAction=async e=>{e.preventDefault();setAccountError("");if(authMode==="reset"){setAccountError("El restablecimiento por correo aún necesita configurar el servicio de correo.");return}try{const action=authMode==="register"?"register":"login";const r=await fetch("/api/account",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,username:authForm.username,email:authForm.email,password:authForm.password})});const d=await r.json();if(!r.ok)throw new Error(d.error||"No se pudo conectar la cuenta.");setAccount(d.user);setRepos(d.repos||[]);setMode("home");history.replaceState(null,"","/");}catch(e){setAccountError(e.message)}};
- const savePages=async()=>{if(!account){go("login");return null}setBusy(true);try{const r=await fetch("/api/pages",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"project",project:{id:repoId||undefined,name:project,slug:project,description:"GutHeb Workers project",files}})});const d=await r.json();if(!r.ok)throw new Error(d.error||"No se pudo guardar.");setRepoId(d.id);localStorage.setItem("ghw-project-id",d.id);history.replaceState(null,"","/builder/"+encodeURIComponent(d.id));setRepos(x=>x.some(r=>r.id===d.id)?x.map(r=>r.id===d.id?{...r,name:project,updated_at:new Date().toISOString()}:r):[...x,{id:d.id,name:project,description:"GutHeb Workers project",language:"JavaScript",visibility:"Public",license:"MIT",updated_at:new Date().toISOString(),files}]);return d.id}catch(e){setLog(x=>[...x,"✕ "+e.message]);return null}finally{setBusy(false)}};
- const runTests=async(sourceFiles=files)=>{const out=[];for(const[path,content]of Object.entries(sourceFiles)){if(path.endsWith(".html")){try{const d=new DOMParser().parseFromString(content,"text/html");out.push("✓ HTML "+path+(d.querySelector("parsererror")?" tiene errores":" OK"))}catch(e){out.push("✕ HTML "+path+": "+e.message)}}else if(path.endsWith(".css")){try{const sheet=new CSSStyleSheet();sheet.replaceSync(content);out.push("✓ CSS "+path+" OK")}catch(e){out.push("✕ CSS "+path+": "+e.message)}}else if(path.endsWith(".js")||path.endsWith(".jsx")){try{const stripped=content.replace(/^\\s*import[^;]+;?/gm,"").replace(/^\\s*export\\s+(default\\s+)?/gm,"");new Function(stripped);out.push("✓ JS "+path+" syntax OK")}catch(e){out.push("✕ JS "+path+": "+e.message)}}}setLog(x=>[...x,"🧪 Tests de la aplicación:",...out]);return out};
-const ask=async()=>{const q=ai.trim();if(!q)return;setAi("");setLog(x=>[...x,"Tú: "+q,"⟳ GutHeb AI está trabajando en los archivos…"]);try{const r=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:q,history:log.slice(-8),files})});const d=await r.json();if(!r.ok)throw new Error(d.error||"AI request failed");let changed=false;let nextFiles={...files};const ops=[...(d.operations||[]),...(d.backend_actions||[]).map(x=>({type:"write_file",path:x.path,content:x.content}))];for(const op of ops){const path=String(op.path||"").replace(/^\/+|^\.\.\//g,"");if(!path||path.includes(".."))continue;if(op.type==="write_file"||op.type==="write_backend"){nextFiles[path]=String(op.content||"");setActive(path);changed=true;setLog(x=>[...x,"✓ AI escribió "+path])}else if(op.type==="delete_file"){delete nextFiles[path];changed=true;setLog(x=>[...x,"✓ AI eliminó "+path])}else if(op.type==="create_folder"){const p=path.replace(/\/$/,"")+"/.gitkeep";nextFiles[p]="";changed=true;setLog(x=>[...x,"✓ AI creó "+path])}}if(changed){setFiles(nextFiles);setBusy(true);try{const sr=await fetch("/api/pages",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"project",project:{id:repoId||undefined,name:project,slug:project,description:"GutHeb Workers project",files:nextFiles}})});const sd=await sr.json();if(!sr.ok)throw new Error(sd.error||"No se pudo persistir el cambio.");setRepoId(sd.id);setLog(x=>[...x,"✓ Cambios de IA guardados en workers-pages"])}finally{setBusy(false)}}if((d.search_queries||[]).length){for(const query of d.search_queries.slice(0,3)){const sr=await fetch("/api/search?q="+encodeURIComponent(query));const sd=await sr.json();setLog(x=>[...x,"🔎 Búsqueda: "+query,...(sd.results||[]).slice(0,5).map(z=>"• "+z.title+(z.url?" · "+z.url:""))])}}if((d.tests||[]).length||changed)await runTests(nextFiles);const aiMsg=String(d.message||d.output||"Listo.").trim();const looksLikeFailure=/doesn.?t match|does not match|failed|failure|error|cannot|can't|unable/i.test(aiMsg);if(changed&&looksLikeFailure){setLog(x=>[...x,"✓ La operación de IA terminó correctamente. El mensaje final del modelo se omitió porque contradice el resultado real de la operación."])}else if(aiMsg){setLog(x=>[...x,"GutHeb AI: "+aiMsg])}}catch(e){setLog(x=>[...x,"✕ AI: "+e.message])}};
- const update=v=>setFiles(x=>({...x,[active]:v}));
- const addFile=()=>{const p=prompt("Nombre del archivo","src/App.jsx");if(p&&!files[p]){setFiles(x=>({...x,[p]:""}));setActive(p)}};
- const addFolder=()=>{const p=prompt("Nombre de la carpeta","src/components");if(p)setFiles(x=>({...x,[p.replace(/\/$/,"")+"/.gitkeep"]:""}))};
- const startProject=()=>{if(!account){go("login");return}const id=repoId||crypto.randomUUID();setRepoId(id);localStorage.setItem("ghw-project-id",id);setMode("builder");history.replaceState(null,"","/builder/"+encodeURIComponent(id))};
- const createRepo=async()=>{
-  if(!account){go("login");return}
-  const name=prompt("Repository name","my-project");
-  if(!name)return;
-  const cleanName=name.trim().replace(/[^a-zA-Z0-9._-]/g,"-").replace(/-+/g,"-").slice(0,80);
-  if(!cleanName)return;
-  try{
-   const r=await fetch("/api/account",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"repo",repo:{name:cleanName,description:"GutHeb Workers repository",visibility:"Public",language:"JavaScript",license:"MIT",files:starter}})});
-   const d=await r.json();
-   if(!r.ok)throw new Error(d.error||"No se pudo crear el repositorio.");
-   setProject(cleanName);
-   setRepoId(d.id||null);
-   setFiles(starter);
-   localStorage.setItem("ghw-project",cleanName);
-   setMode("home");
-   history.replaceState(null,"","/");
-  }catch(e){setAccountError(e.message)}
+ const path=location.pathname;
+ if(path.startsWith("/pages/"))return <PublishedPage/>;
+ const state=useProject();
+ const[screen,setScreen]=useState(path.startsWith("/builder")?"builder":"home");
+ const[auth,setAuth]=useState(path==="/signup"?"register":path==="/reset-password"?"reset":"login");
+
+ useEffect(()=>{
+  fetch("/api/account",{credentials:"include"}).then(async r=>r.ok?r.json():null).then(async d=>{
+   if(d?.user){
+    state.setAccount(d.user);
+    const mr=await fetch("/api/account",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"me"})});
+    if(mr.ok){const md=await mr.json();state.setRepos(md.repos||[]);}
+    setScreen(path.startsWith("/builder")?"builder":"home");
+   }
+  }).catch(()=>{});
+ },[]);
+
+ const navigate=(next)=>{
+  setScreen(next);
+  const url=next==="builder"?"/builder/"+encodeURIComponent(state.projectId||"new"):"/";
+  history.replaceState(null,"",url);
  };
- if(location.pathname.startsWith("/pages/"))return <PagesViewer/>; if(mode==="login"||mode==="register"||mode==="reset")return <AuthModal mode={authMode} setMode={go} form={authForm} setForm={setAuthForm} error={accountError} onSubmit={accountAction}/>;
- if(mode==="repo")return <RepoView repo={repos.find(r=>r.id===repoId)||{id:repoId,name:project,files}} onBack={()=>{setMode("home");history.replaceState(null,"","/")}} onOpenBuilder={()=>{setMode("builder");history.replaceState(null,"","/builder/"+encodeURIComponent(repoId))}}/>;
- if(mode==="home")return <Home account={account} project={project} repos={repos} onStart={startProject} onCreateRepo={createRepo} onOpenRepo={r=>{setRepoId(r.id);setProject(r.name);setFiles(r.files&&Object.keys(r.files).length?r.files:starter);localStorage.setItem("ghw-project-id",r.id);localStorage.setItem("ghw-project",r.name);setMode("repo");history.replaceState(null,"","/repo/"+encodeURIComponent(r.id))}} onLogin={()=>go("login")} onRegister={()=>go("register")}/>;
- return <Builder theme={theme} setTheme={setTheme} repoId={repoId} account={account} project={project} setProject={setProject} files={files} setFiles={setFiles} active={active} setActive={setActive} ai={ai} setAi={setAi} log={log} setLog={setLog} panel={panel} setPanel={setPanel} view={view} setView={setView} update={update} addFile={addFile} addFolder={addFolder} savePages={savePages} busy={busy} ask={ask} runTests={runTests}/>;
+ const loginMode=(m)=>{setAuth(m);history.replaceState(null,"",m==="register"?"/signup":m==="reset"?"/reset-password":"/login");setScreen("auth")};
+
+ if(screen==="auth")return <Auth mode={auth} setMode={loginMode} onDone={(user)=>{state.setAccount(user);setScreen("home");history.replaceState(null,"","/")}}/>;
+ if(screen==="home")return <Home account={state.account} repos={state.repos} onNew={()=>navigate("builder")} onOpen={(r)=>{
+   state.setProjectId(r.id);state.setProject(r.name);state.setFiles(r.files&&Object.keys(r.files).length?r.files:starter);localStorage.setItem("ghw-project-id",r.id);navigate("builder")
+ }} onLogin={()=>loginMode("login")} onSignup={()=>loginMode("register")}/>;
+ return <Builder {...state} onHome={()=>navigate("home")} />;
 }
 
+function Auth({mode,setMode,onDone}){
+ const register=mode==="register",reset=mode==="reset";
+ const[form,setForm]=useState({username:"",email:"",password:""});
+ const[error,setError]=useState("");
+ const submit=async e=>{
+  e.preventDefault();setError("");
+  if(reset){setError("password reset needs an email provider configured in cloudflare first");return}
+  try{
+   const r=await fetch("/api/account",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:register?"register":"login",...form})});
+   const d=await r.json();if(!r.ok)throw new Error(d.error||"could not sign in");onDone(d.user);
+  }catch(e){setError(e.message)}
+ };
+ return <div className="authPage"><div className="authBackdrop"/><main className="authWrap">
+   <div className="brand lockup"><img src="/gutheb-workers.svg"/><span>GutHeb</span></div>
+   <section className="authCard">
+    <div className="miniLabel">GUTHEB WORKERS</div>
+    <h1>{reset?"reset your password":register?"create your account":"welcome back"}</h1>
+    <p>{reset?"enter your email to receive reset instructions":register?"your projects are saved to your workers account":"sign in to keep building"}</p>
+    <form onSubmit={submit}>
+     {register&&<input autoFocus required placeholder="username" value={form.username} onChange={e=>setForm({...form,username:e.target.value})}/>}
+     <input autoFocus={!register} required type="email" placeholder="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/>
+     {!reset&&<input required minLength={8} type="password" placeholder="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})}/>}
+     {error&&<div className="formError">{error}</div>}
+     <button className="solid wide" type="submit">{reset?"send instructions":register?"create account":"log in"}</button>
+    </form>
+    {!reset&&<button className="textButton" onClick={()=>setMode("reset")}>forgot password?</button>}
+    <div className="authSwitch">{reset?"remembered it?":register?"already have an account?":"new here?"} <button onClick={()=>setMode(reset?"login":register?"login":"register")}>{reset?"log in":register?"log in":"sign up"}</button></div>
+   </section>
+ </main></div>;
+}
 
-function AiQuestionCard({question,options,onChoose}){return <div className="aiQuestionCard"><div className="aiQuestionIcon">✦</div><div className="aiQuestionBody"><div className="aiQuestionLabel">GUTHEB AI</div><h3>{question}</h3><div className="aiQuestionOptions">{options.map((x,i)=><button key={i} onClick={()=>onChoose(x)}>{x}<span>↗</span></button>)}</div></div></div>}
-function AuthModal({mode,setMode,form,setForm,error,onSubmit}){const reset=mode==="reset";const register=mode==="register";return <div className="authPage"><div className="authGlow"/><main className="authShell"><div className="authBrand"><img src="/gutheb-workers.svg?v=20260927"/><span>GutHeb Workers</span></div><section className="authCard"><div className="eyebrow">GUTHEB WORKERS</div><h1>{reset?"Reset your password":register?"Create your account":"Welcome back"}</h1><p>{reset?"Enter your email and we’ll send instructions to reset your password.":register?"Create an account before you start building.":"Sign in before creating or editing an application."}</p><form onSubmit={onSubmit}>{register&&<input required placeholder="Username" value={form.username} onChange={e=>setForm({...form,username:e.target.value})}/>}<input required type="email" placeholder="Email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/>{!reset&&<input required minLength={8} type="password" placeholder="Password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})}/>} {error&&<div className="error">{error}</div>}<button className="authPrimary" type="submit">{reset?"Send reset instructions":register?"Create account":"Log in"}</button></form>{!reset&&<button className="authLink" onClick={()=>setMode("reset")}>Forgot password?</button>}<div className="authBottom">{reset?"Remembered your password?":"Don’t have an account?"} <button onClick={()=>setMode(reset?"login":register?"login":"register")}>{reset?"Log in":register?"Log in":"Sign up"}</button></div></section><small className="authFoot">You must be signed in to create a GutHeb Workers project.</small></main></div>}
+function Home({account,repos,onNew,onOpen,onLogin,onSignup}){
+ return <div className="homePage">
+  <header className="homeTop"><div className="brand"><img src="/gutheb-workers.svg"/><span>GutHeb</span></div><div className="homeActions">{account?<span className="accountPill">{account.name||account.username}</span>:<><button onClick={onLogin}>log in</button><button className="solid" onClick={onSignup}>sign up</button></>}</div></header>
+  <main className="homeMain">
+   <div className="homeIntro"><div className="miniLabel">WORKSPACE</div><h1>what will you build?</h1><p>start with an idea, then shape it in the builder</p></div>
+   <div className="projectGrid">
+    <button className="newProject" onClick={onNew}><span className="newIcon">＋</span><b>new app</b><small>start from a blank project</small></button>
+    {repos.map(r=><button className="projectCard" key={r.id} onClick={()=>onOpen(r)}><div className="projectThumb"><span>✦</span></div><div><b>{r.name}</b><small>{r.description||"gutheb workers project"}</small></div></button>)}
+   </div>
+  </main>
+ </div>;
+}
 
-function Welcome({onStart,onLogin}){return <div className="welcomePage"><div className="ambientGlow glowA"/><div className="ambientGlow glowB"/><header className="welcomeNav"><div className="b44Brand"><img src="/gutheb-workers.svg?v=20260927"/><span>GutHeb</span></div><nav><a href="#product">Product</a><a href="#solutions">Solutions</a><a href="#resources">Resources</a><a href="#pricing">Pricing</a></nav><div><button className="plainBtn" onClick={onLogin}>Log in</button><button className="darkBtn" onClick={onStart}>Start building</button></div></header><main className="welcomeHero"><div className="eyebrow">GUTHEB WORKERS</div><h1>Build your app.<br/><i>Just describe it.</i></h1><p>Turn an idea into a real, working product with AI. Start free, explore the result, and keep refining it in conversation.</p><div className="welcomePrompt"><div>✦</div><textarea placeholder="Describe the app you want to build…" onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();onStart()}}}/><button onClick={onStart}>Create app ↗</button></div><div className="heroMeta"><span>No setup</span><span>•</span><span>Live preview</span><span>•</span><span>AI iteration</span></div></main><section className="welcomeSection" id="product"><div className="sectionIntro"><span className="eyebrow">ONE WORKSPACE</span><h2>From idea to something real.</h2><p>Build screens, flows and functionality together, then keep refining everything with natural language.</p></div><div className="featureGrid"><article><b>✦</b><h3>Build with AI</h3><p>Describe what you need and keep the conversation going as your project evolves.</p></article><article><b>◫</b><h3>See every page</h3><p>Work visually with live page previews instead of staring at an empty code editor.</p></article><article><b>◌</b><h3>Control the design</h3><p>Keep global visual choices consistent across your project.</p></article><article><b>⌁</b><h3>Open the code</h3><p>When you want deeper control, switch from visual building to your files.</p></article></div></section><section className="welcomeSection alt" id="solutions"><div className="sectionIntro"><span className="eyebrow">START ANYWHERE</span><h2>Apps, websites, tools and experiments.</h2><p>GutHeb Workers is designed around the same prompt → build → refine loop.</p></div></section><footer className="welcomeFooter"><div className="b44Brand"><img src="/gutheb-workers.svg?v=20260927"/><span>GutHeb</span></div><span>Build something real.</span></footer></div>}
+function Builder({files,setFiles,project,setProject,projectId,setProjectId,account,busy,setBusy,onHome}){
+ const[mode,setMode]=useState("edit");
+ const[device,setDevice]=useState("desktop");
+ const[chat,setChat]=useState("");
+ const[messages,setMessages]=useState([]);
+ const[page,setPage]=useState("index.html");
+ const[inspector,setInspector]=useState("pages");
+ const[codeOpen,setCodeOpen]=useState(false);
+ const[previewKey,setPreviewKey]=useState(0);
+ const[status,setStatus]=useState("saved");
+ const[mobileOpen,setMobileOpen]=useState(false);
+ const[activeFile,setActiveFile]=useState("index.html");
 
+ const html=files[page]||files["index.html"]||"<h1>no index.html</h1>";
+ const preview=useMemo(()=>injectPreview(html),[html,previewKey]);
 
-function RepoView({repo,onBack,onOpenBuilder}){const files=repo.files||{};return <div className="repoPage"><header className="repoNav"><button onClick={onBack}>← Workspace</button><div className="repoBrand"><img src="/gutheb-workers.svg?v=20260927"/><b>{repo.name||"Repository"}</b></div><button className="repoOpenBuilder" onClick={onOpenBuilder}>Open builder</button></header><main className="repoMain"><div className="repoHero"><div><span className="repoEyebrow">REPOSITORY</span><h1>{repo.name}</h1><p>{repo.description||"GutHeb Workers repository"}</p><div className="repoMeta"><span>ID: {repo.id}</span><span>{repo.visibility||"Public"}</span><span>{repo.language||"Unknown"}</span><span>{repo.license||"MIT"}</span></div></div></div><section className="repoFiles"><div className="repoFilesHead"><b>Files</b><span>{Object.keys(files).length} files</span></div>{Object.keys(files).length?Object.keys(files).map(path=><div className="repoFileRow" key={path}><span>◇</span><code>{path}</code><span>View</span></div>):<div className="repoEmpty">This repository has no files yet.</div>}</section></main></div>}
+ const save=async(nextFiles=files)=>{
+  if(!account){setMessages(m=>[...m,{role:"system",text:"sign in first to save this project"}]);return null}
+  setBusy(true);setStatus("saving…");
+  try{
+   const r=await fetch("/api/pages",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"project",project:{id:projectId||undefined,name:project,slug:project,description:"GutHeb Workers project",files:nextFiles}})});
+   const d=await r.json();if(!r.ok)throw new Error(d.error||"could not save");
+   setProjectId(d.id);localStorage.setItem("ghw-project-id",d.id);history.replaceState(null,"","/builder/"+encodeURIComponent(d.id));setStatus("saved");return d.id;
+  }catch(e){setStatus("error");setMessages(m=>[...m,{role:"system",text:e.message}]);return null}finally{setBusy(false)}
+ };
 
-function Home({account,project,repos,onStart,onCreateRepo,onOpenRepo,onLogin,onRegister}){return <div className="homePage"><header className="homeNav"><div className="b44Brand"><img src="/gutheb-workers.svg?v=20260927"/><span>GutHeb Workers</span></div><div>{account?<span>{account.name||account.username}</span>:<><button onClick={onLogin}>Log in</button><button onClick={onRegister}>Sign up</button></>}</div></header><main className="homeMain"><div className="homeTitle"><span className="eyebrow">WORKSPACE</span><h1>Your projects</h1><p>Repositories stay in their own pages. Builders stay in their own workspaces.</p></div><div className="appGrid"><button className="newAppCard" onClick={onCreateRepo}><strong>＋</strong><span>New repository</span><small>Create a native GutHeb repository</small></button><button className="newAppCard" onClick={onStart}><strong>✦</strong><span>New builder</span><small>Create a separate app workspace</small></button>{repos.map(r=><button className="appCard" key={r.id} onClick={()=>onOpenRepo(r)}><div className="fakeThumb">◇</div><strong>{r.name}</strong><small>{r.description||"GutHeb repository"} · ID {r.id}</small></button>)}</div></main></div>}
+ const ask=async()=>{
+  const q=chat.trim();if(!q)return;setChat("");setMessages(m=>[...m,{role:"user",text:q},{role:"ai",text:"working on your app…"}]);
+  try{
+   const r=await fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:q,history:messages.slice(-10),files})});
+   const d=await r.json();if(!r.ok)throw new Error(d.error||"ai request failed");
+   let next={...files},changed=false;
+   for(const op of [...(d.operations||[]),...(d.backend_actions||[]).map(x=>({type:"write_file",path:x.path,content:x.content}))]){
+    const p=String(op.path||"").replace(/^\/+|^\.\.\//g,"");if(!p||p.includes(".."))continue;
+    if(op.type==="write_file"||op.type==="write_backend"){next[p]=String(op.content??"");changed=true;setActiveFile(p)}
+    if(op.type==="delete_file"){delete next[p];changed=true}
+   }
+   if(changed){setFiles(next);await save(next);setPreviewKey(x=>x+1)}
+   setMessages(m=>[...m.slice(0,-1),{role:"ai",text:String(d.message||"done")+(changed?"":"") }]);
+  }catch(e){setMessages(m=>[...m.slice(0,-1),{role:"ai error",text:e.message}])}
+ };
 
-function Builder({theme,setTheme,repoId,account,project,setProject,files,setFiles,active,setActive,ai,setAi,log,setLog,panel,setPanel,view,setView,update,addFile,addFolder,savePages,busy,ask,runTests}){const [showTools,setShowTools]=useState(false);return <div className={"base44App dark "+theme}><header className="b44Top"><div className="b44Brand"><img src="/gutheb-workers.svg?v=20260927"/><span>GutHeb</span></div><div className="b44Project"><span>{project}</span><button onClick={()=>setProject(prompt("Project name",project)||project)}>⌄</button></div><div className="b44TopActions"><button className={view==="canvas"?"sel":""} onClick={()=>setView("canvas")}>Canvas</button><button className={view==="preview"?"sel":""} onClick={()=>setView("preview")}>Preview</button><div className={"panelGroup "+(showTools?"open":"")}><button className="panelTrigger" onClick={()=>setShowTools(v=>!v)}>Panel <span>⌄</span></button>{showTools&&<div className="panelPopover"><button onClick={()=>{setView("code");setShowTools(false)}}>Code</button><button onClick={()=>{setPanel("chat");setShowTools(false)}}>AI</button><button onClick={()=>{setPanel("theme");setShowTools(false)}}>Theme</button><button onClick={async()=>{await savePages();setShowTools(false)}}>{busy?"Saving…":"Save"}</button></div>}</div><button className="publish" onClick={async()=>{const savedId=await savePages();const publishId=savedId||repoId;if(!publishId){setLog(x=>[...x,"✕ No se pudo obtener el ID del proyecto."]);return}try{const r=await fetch("/api/pages",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"deployment",projectId:publishId,status:"published",metadata:{runtime:"web-native"}})});const d=await r.json();if(!r.ok)throw new Error(d.error||"No se pudo publicar.");setLog(x=>[...x,"✓ Publicado en /pages/#"+d.id]);}catch(e){setLog(x=>[...x,"✕ Publish: "+e.message])}}}>Publish</button><div className="avatar">{account?(account.name||"U")[0].toUpperCase():"?"}</div></div></header><div className="b44Body"><aside className="b44Left"><button className={panel==="chat"?"leftSel":""} onClick={()=>setPanel("chat")}>✦<span>Build</span></button><button className={panel==="pages"?"leftSel":""} onClick={()=>setPanel("pages")}>▤<span>Pages</span></button><button className={panel==="files"?"leftSel":""} onClick={()=>setPanel("files")}>⌁<span>Files</span></button><button className={panel==="theme"?"leftSel":""} onClick={()=>setPanel("theme")}>◐<span>Design</span></button><button className={panel==="settings"?"leftSel":""} onClick={()=>setPanel("settings")}>⚙<span>Settings</span></button></aside>{panel==="chat"?<aside className="b44Chat"><div className="chatHead"><b>Build with AI</b><span>New chat</span></div><div className="chatWelcome"><div className="spark">✦</div><h2>What do you want to build?</h2><p>Describe your idea, then refine the result page by page.</p></div><div className="chatLog">{log.slice(-8).map((x,i)=><div key={i} className={x.startsWith("Tú:")?"userMsg":"aiMsg"}>{x}</div>)}</div><div className="chatBox"><textarea value={ai} onChange={e=>setAi(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask()}}} placeholder="Describe what you want to build…"/><button onClick={ask}>↑</button></div></aside>:<aside className="b44Inspector"><b>{panel==="pages"?project:panel==="files"?"Files":panel==="theme"?"Design":"Settings"}</b>{panel==="files"&&<><button onClick={addFile}>＋ New file</button><button onClick={addFolder}>＋ New folder</button>{Object.keys(files).map(f=><button key={f} onClick={()=>setActive(f)}>{f}</button>)}</>}{panel==="pages"&&<><div className="pagesProjectHead"><strong>{project}</strong><span>Pages in this project</span></div><p>Every page appears as a live frame on the canvas.</p><div className="pageNameRow"><span className="pageDot"></span><span>{project} · Home</span></div><button onClick={()=>setPanel("chat")}>Ask AI to add a page</button></>}{panel==="theme"&&<><p>Global colors, fonts, spacing and responsive design.</p><button onClick={()=>setPanel("chat")}>Ask AI to redesign</button><button onClick={runTests}>Run tests</button></>}{panel==="settings"&&<p>Project settings, runtime and publishing.</p>}</aside>}<main className="b44Canvas">{view==="canvas"?<><div className="canvasToolbar"><div className="canvasModes"><button className="toolbarActive">Canvas</button><button onClick={()=>setView("preview")}>Preview</button><button>Desktop</button><button>Tablet</button><button>Phone</button></div><div className="canvasActions"><button>−</button><span>100%</span><button>＋</button><button>Fit</button><button>＋ Add page</button></div></div><div className="infiniteCanvas"><div className="siteFrame largePreview"><div className="siteFrameBar"><span>●</span><span>●</span><span>●</span><em>{project} · Home</em></div><iframe title="canvas" sandbox="allow-scripts" srcDoc={files["index.html"]||"<main><h1>Start building</h1></main>"}/></div></div></>:view==="preview"?<div className="appPreview"><div className="previewToolbar"><button onClick={()=>setView("canvas")}>← Canvas</button><span>Preview</span><div><button>Desktop</button><button>Tablet</button><button>Phone</button><button onClick={()=>window.location.reload()}>↻</button></div></div><div className="previewStage"><div className="previewBrowser"><div className="previewDots"><i></i><i></i><i></i></div><span>{project}</span></div><iframe title="live application preview" sandbox="allow-scripts allow-forms allow-modals" srcDoc={files["index.html"]||"<main><h1>Start building</h1></main>"}/></div></div>:<div className="codeView"><div className="codeTabs">{Object.keys(files).map(f=><button className={f===active?"active":""} key={f} onClick={()=>setActive(f)}>{f}</button>)}</div><textarea spellCheck="false" value={files[active]||""} onChange={e=>update(e.target.value)}/></div>}</main></div></div>}
+ const deploy=async()=>{
+  const id=await save();if(!id)return;
+  try{
+   const r=await fetch("/api/pages",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"deployment",projectId:id,status:"published",metadata:{source:"gutheb-workers-builder"}})});
+   const d=await r.json();if(!r.ok)throw new Error(d.error||"deployment failed");
+   const url=location.origin+"/pages/"+encodeURIComponent(d.id);
+   setMessages(m=>[...m,{role:"system",text:"published → "+url}]);
+   window.open(url,"_blank","noopener,noreferrer");
+  }catch(e){setMessages(m=>[...m,{role:"system",text:e.message}])}
+ };
+
+ const updateFile=(content)=>{setFiles(x=>({...x,[activeFile]:content}));setStatus("unsaved")};
+
+ return <div className="builderShell">
+  <header className="builderTop">
+   <div className="topLeft"><button className="iconButton" onClick={onHome} title="workspace">{icon("‹")}</button><div className="brand"><img src="/gutheb-workers.svg"/><span>GutHeb</span></div><button className="projectSelect" onClick={()=>{const n=prompt("project name",project);if(n){setProject(n);setStatus("unsaved")}}}>{project}<span>⌄</span></button></div>
+   <div className="topCenter">
+    <button className={mode==="preview"?"topTab active":"topTab"} onClick={()=>setMode("preview")}>preview</button>
+    <button className={mode==="dashboard"?"topTab active":"topTab"} onClick={()=>setMode("dashboard")}>dashboard</button>
+    <button className={mode==="edit"?"topTab active":"topTab"} onClick={()=>setMode("edit")}>edit</button>
+    <button className={mode==="canvas"?"topTab active":"topTab"} onClick={()=>setMode("canvas")}>canvas</button>
+   </div>
+   <div className="topRight"><span className="saveState">{status}</span><button className="iconButton" onClick={()=>setCodeOpen(v=>!v)} title="code">{icon("</>")}</button><button className="solid publish" onClick={deploy} disabled={busy}>{busy?"…":"publish"}</button><button className="avatar">{(account?.name||"g").slice(0,1).toUpperCase()}</button></div>
+  </header>
+
+  <div className="builderBody">
+   <aside className="chatPane">
+    <div className="chatHeader"><div><b>{mode==="dashboard"?"dashboard":"gutheb ai"}</b><small>{mode==="dashboard"?"project controls":"describe what you want to change"}</small></div><button className="iconButton" onClick={()=>setMobileOpen(v=>!v)}>⋯</button></div>
+    {mode==="dashboard"?<Dashboard project={project} files={files} onSave={()=>save()} onDeploy={deploy}/>:mode==="canvas"?<CanvasHelp/>:<>
+      <div className="chatMessages">
+       {messages.length===0&&<div className="chatWelcome"><div className="spark">✦</div><h2>what should we build?</h2><p>tell gutheb ai what you want and it will edit the project for you</p><div className="suggestions"><button onClick={()=>setChat("make the landing page feel more polished")}>make it more polished</button><button onClick={()=>setChat("add a responsive navigation")}>add responsive navigation</button><button onClick={()=>setChat("redesign this with a modern editorial style")}>redesign the page</button></div></div>}
+       {messages.map((m,i)=><div className={"chatMessage "+m.role} key={i}><span className="messageAvatar">{m.role==="user"?"you":"✦"}</span><div><div className="messageText">{m.text}</div>{m.role==="ai"&&<div className="messageActions"><button>↶</button><button>⋯</button></div>}</div></div>)}
+      </div>
+      <div className="chatComposer"><div className="composerBox"><textarea value={chat} onChange={e=>setChat(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask()}}} placeholder="describe what you want to build…"/><div className="composerBottom"><button>＋</button><span>enter to send</span><button className="send" onClick={ask}>↑</button></div></div></div>
+    </>}
+   </aside>
+
+   <main className="previewPane">
+    <div className="previewToolbar"><div className="crumb">{icon("⌂")} <span>{project}</span><span>/</span><b>{page}</b></div><div className="deviceTools"><button className={device==="desktop"?"active":""} onClick={()=>setDevice("desktop")}>▱</button><button className={device==="tablet"?"active":""} onClick={()=>setDevice("tablet")}>▯</button><button className={device==="mobile"?"active":""} onClick={()=>setDevice("mobile")}>▯</button><button onClick={()=>setPreviewKey(x=>x+1)}>↻</button></div></div>
+    <div className="previewStage">
+      {mode==="canvas"?<Canvas preview={preview} device={device}/>:mode==="dashboard"?<Canvas preview={preview} device={device}/>:<div className={"siteFrame "+device}><iframe key={previewKey} title="app preview" sandbox="allow-scripts allow-forms allow-modals allow-popups" srcDoc={preview}/></div>}
+    </div>
+   </main>
+
+   <aside className="inspectorPane">
+    <div className="inspectorTabs"><button className={inspector==="pages"?"active":""} onClick={()=>setInspector("pages")}>pages</button><button className={inspector==="files"?"active":""} onClick={()=>setInspector("files")}>files</button><button className={inspector==="style"?"active":""} onClick={()=>setInspector("style")}>style</button></div>
+    {inspector==="pages"&&<Pages files={files} page={page} setPage={setPage}/>}
+    {inspector==="files"&&<Files files={files} active={activeFile} setActive={setActiveFile} onAdd={()=>{const p=prompt("file path","src/App.jsx");if(p&&!files[p])setFiles(x=>({...x,[p]:""}))}}/>}
+    {inspector==="style"&&<StylePanel/>}
+   </aside>
+  </div>
+
+  {codeOpen&&<CodeDrawer files={files} active={activeFile} setActive={setActiveFile} value={files[activeFile]||""} onChange={updateFile} onSave={()=>save()}/>}
+ </div>;
+}
+
+function Pages({files,page,setPage}){
+ const pages=[["index.html","home"],...Object.keys(files).filter(x=>x.endsWith(".html")&&x!=="index.html").map(x=>[x,x.replace(".html","")])];
+ return <div className="inspectorContent"><div className="panelTitle"><span>pages</span><button>＋</button></div><div className="pageList">{pages.map(([p,label])=><button className={p===page?"pageItem active":"pageItem"} key={p} onClick={()=>setPage(p)}><span>□</span><span>{label}</span><small>{p}</small></button>)}</div><div className="inspectorSection"><b>project</b><div className="kv"><span>files</span><span>{Object.keys(files).length}</span></div><div className="kv"><span>runtime</span><span>web</span></div></div></div>;
+}
+
+function Files({files,active,setActive,onAdd}){
+ return <div className="inspectorContent"><div className="panelTitle"><span>files</span><button onClick={onAdd}>＋</button></div><div className="fileList">{Object.keys(files).sort().map(p=><button className={p===active?"fileItem active":"fileItem"} key={p} onClick={()=>setActive(p)}>{icon(p.endsWith(".html")?"◇":p.endsWith(".css")?"◈":"◆")}<span>{p}</span></button>)}</div></div>;
+}
+
+function StylePanel(){
+ return <div className="inspectorContent"><div className="panelTitle"><span>design</span></div><div className="styleMock"><label>theme</label><div className="swatches"><i/><i/><i/><i/></div><label>layout</label><button>responsive</button><button>rounded</button><button>compact</button><label>typography</label><div className="typePreview">Aa <span>Inter / system</span></div></div></div>;
+}
+
+function Dashboard({project,files,onSave,onDeploy}){
+ return <div className="dashboard"><div className="dashHero"><span className="miniLabel">APP DASHBOARD</span><h2>{project}</h2><p>manage your project, files and publishing</p></div><div className="dashCards"><div><b>{Object.keys(files).length}</b><span>files</span></div><div><b>web</b><span>runtime</span></div><div><b>pages</b><span>storage</span></div></div><button className="dashboardAction" onClick={onSave}>save project</button><button className="dashboardAction" onClick={onDeploy}>publish latest version</button></div>;
+}
+
+function CanvasHelp(){return <div className="canvasInfo"><span className="spark">✦</span><h2>canvas</h2><p>use the live preview as your visual workspace. choose a page above, switch device sizes, and keep iterating with ai.</p></div>}
+function Canvas({preview,device}){return <div className="canvasBoard"><div className="canvasCard"><div className="canvasCardTop">live page <span>100%</span></div><div className={"siteFrame "+device}><iframe title="canvas preview" sandbox="allow-scripts allow-forms allow-modals allow-popups" srcDoc={preview}/></div></div></div>}
+
+function CodeDrawer({files,active,setActive,value,onChange,onSave}){
+ return <div className="codeDrawer"><div className="codeHead"><div className="codeTabs">{Object.keys(files).sort().map(p=><button className={p===active?"active":""} key={p} onClick={()=>setActive(p)}>{p}</button>)}</div><button className="solid small" onClick={onSave}>save</button></div><textarea value={value} onChange={e=>onChange(e.target.value)} spellCheck="false"/></div>;
+}
+
+function PublishedPage(){
+ const[id]=useState(()=>decodeURIComponent(location.pathname.split("/")[2]||""));
+ const[status,setStatus]=useState("loading…"),[html,setHtml]=useState("");
+ useEffect(()=>{fetch("/api/deployment/"+encodeURIComponent(id)).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||"not found");setHtml(injectPublished((d.files||[]).find(x=>x.path==="index.html")?.content||"",location.origin+"/pages/"+encodeURIComponent(id)+"/"));setStatus("")}).catch(e=>setStatus(e.message))},[id]);
+ if(status)return <div className="publishedState">{status}</div>;
+ return <iframe className="publishedFrame" title="published app" srcDoc={html}/>;
+}
+
+function injectPublished(source,base){
+ let html=injectPreview(source);
+ if(!/<base\s/i.test(html))html=html.replace(/<head>/i,`<head><base href="${base}">`);
+ return html;
+}
+
+function injectPreview(source){
+ let html=String(source||"");
+ if(!/<html[\s>]/i.test(html))html="<!doctype html><html><head></head><body>"+html+"</body></html>";
+ if(!/<meta[^>]+viewport/i.test(html))html=html.replace(/<head>/i,'<head><meta name="viewport" content="width=device-width,initial-scale=1">');
+ return html;
+}
 
 createRoot(document.getElementById("root")).render(<App/>);
