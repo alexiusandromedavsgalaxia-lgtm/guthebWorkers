@@ -9,9 +9,10 @@ function PagesViewer(){
  const[id]=useState(()=>decodeURIComponent(location.hash.replace(/^#/,"")));
  const[status,setStatus]=useState("Cargando publicación…"),[html,setHtml]=useState("");
  useEffect(()=>{if(!id){setStatus("Falta el ID de publicación.");return}
- fetch("/api/deployment/"+encodeURIComponent(id)).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||"No se encontró la publicación.");const index=(d.files||[]).find(x=>x.path==="index.html");setHtml(index?.content||"<main><h1>GutHeb Pages</h1></main>");setStatus("")}).catch(e=>setStatus(e.message))
+ fetch("/api/deployment/"+encodeURIComponent(id)).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||"No se encontró la publicación.");const index=(d.files||[]).find(x=>x.path==="index.html");setHtml(index?.content||"");setStatus("")}).catch(e=>setStatus(e.message))
  },[id]);
- return <div className="viewer"><header className="viewerBar"><div className="brand"><img src="/gutheb-workers.svg?v=20260927"/><strong>GutHeb Pages</strong></div><a href="/">← Workers</a></header>{status?<div className="viewerState">{status}</div>:<iframe title="GutHeb Pages" sandbox="allow-scripts" srcDoc={html}/>}</div>
+ if(status)return <div className="viewer viewerStateOnly">{status}</div>;
+ return <main className="publishedPage"><iframe title="Published page" sandbox="allow-scripts allow-forms allow-modals allow-popups" srcDoc={html}/></main>
 }
 
 function App(){
