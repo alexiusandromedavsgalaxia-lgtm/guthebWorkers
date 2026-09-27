@@ -77,3 +77,13 @@ html:has(.publishedPage),body:has(.publishedPage){margin:0!important;padding:0!i
 .publishedPage{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;margin:0!important;padding:0!important;background:#fff!important;overflow:hidden!important}
 .publishedPage iframe{display:block!important;width:100%!important;height:100%!important;border:0!important;margin:0!important;padding:0!important;background:#fff!important}
 .viewerStateOnly{min-height:100vh!important;display:grid!important;place-items:center!important;background:#09090b!important;color:#aeb3bd!important;font:14px/1.5 system-ui,sans-serif!important}
+
+/* Preview chrome occupies its own row. The application's own navigation/panel stays inside the preview page and never gets covered by editor chrome. */
+.base44App .previewStage{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:0!important;padding:24px!important;box-sizing:border-box!important;overflow:auto!important}
+.base44App .previewBrowser{position:static!important;top:auto!important;left:auto!important;right:auto!important;width:min(1280px,100%)!important;height:34px!important;min-height:34px!important;margin:0!important;box-sizing:border-box!important;border:1px solid #30343b!important;border-bottom:0!important;border-radius:11px 11px 0 0!important}
+.base44App .previewStage iframe{position:static!important;width:min(1280px,100%)!important;height:calc(100% - 34px)!important;min-height:0!important;margin:0!important;flex:1 1 auto!important;box-sizing:border-box!important;border:1px solid #30343b!important;border-radius:0 0 11px 11px!important;background:#fff!important;box-shadow:0 22px 70px rgba(0,0,0,.45)!important}
+@media(max-width:900px){
+ .base44App .previewStage{padding:16px!important}
+ .base44App .previewBrowser{position:static!important;width:100%!important}
+ .base44App .previewStage iframe{width:100%!important;height:calc(100% - 34px)!important}
+}
