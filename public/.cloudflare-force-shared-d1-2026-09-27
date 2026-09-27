@@ -1,1 +1,5 @@
-shared D1 bindings: USERS_DB=users, REPOS_DB=repos, ARCHIVE_DB=archivecontent, REPOZIP_DB=zip
+FORCE CLOUDFLARE REBUILD 2026-09-27T19:20:13.871Z
+Interface: Base44-style Build/Code canvas
+D1: USERS_DB=users REPOS_DB=repos ARCHIVE_DB=archivecontent REPOZIP_DB=zip WORKERS_PAGES_DB=workers-pages
+Functions: account,pages,ai
+Do not skip this commit.
