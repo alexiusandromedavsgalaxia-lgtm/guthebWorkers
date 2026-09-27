@@ -33,7 +33,7 @@ export async function onRequestPost({request,env}){
     const token=crypto.randomUUID()+crypto.randomUUID(),tokenHash=await sha(token),expires=new Date(Date.now()+1000*60*60*24*30).toISOString();
     await env.GUTHEB_DB.prepare("INSERT INTO sessions(token_hash,user_id,expires_at) VALUES(?,?,?)").bind(tokenHash,row.id,expires).run();
     const p=await env.GUTHEB_DB.prepare("SELECT * FROM profiles WHERE user_id=?").bind(row.id).first();
-    return json({user:{id:row.id,name:row.username,email:row.email},profile:p},{headers:{"Set-Cookie":cookie("gutheb_session",token,60*60*24*30)}});
+    return new Response(JSON.stringify({user:{id:row.id,name:row.username,email:row.email},profile:p}),{status:200,headers:{"Content-Type":"application/json","Cache-Control":"no-store","Set-Cookie":cookie("gutheb_session",token,60*60*24*30)}});
   }
   const user=await userFrom(request,env);if(!user)return json({error:"Not authenticated."},401);
   if(action==="me"){
@@ -63,9 +63,9 @@ export async function onRequestPost({request,env}){
   }
   if(action==="logout"){
     const raw=request.headers.get("Cookie")||"",m=raw.match(/(?:^|; )gutheb_session=([^;]+)/);if(m)await env.GUTHEB_DB.prepare("DELETE FROM sessions WHERE token_hash=?").bind(await sha(m[1])).run();
-    return json({ok:true},{headers:{"Set-Cookie":clearCookie("gutheb_session")}});
+    return new Response(JSON.stringify({ok:true}),{status:200,headers:{"Content-Type":"application/json","Cache-Control":"no-store","Set-Cookie":clearCookie("gutheb_session")}});
   }
   return json({error:"Unknown action."},400);
 }
-export async function onRequestGet({request,env}){return onRequestPost({request:new Request(request,{method:"POST",body:JSON.stringify({action:"me"})}),env})}
+export async function onRequestGet({request,env}){if(!env.GUTHEB_DB)return json({error:"GUTHEB_DB is not bound to this Pages project."},503);const user=await userFrom(request,env);if(!user)return json({error:"Not authenticated."},401);const p=await env.GUTHEB_DB.prepare("SELECT * FROM profiles WHERE user_id=?").bind(user.id).first();return json({user:{id:user.id,name:user.username,email:user.email},profile:p});}
 export async function onRequestOptions(){return new Response(null,{status:204,headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"content-type","Access-Control-Allow-Methods":"GET,POST,OPTIONS"}})}
