@@ -13,3 +13,36 @@
 .topMenu{position:absolute;right:45px;top:45px;z-index:30;background:#fff;border:1px solid #dedee2;border-radius:8px;box-shadow:0 10px 30px #0002;padding:6px;width:150px}.topMenu button{display:block;width:100%;padding:8px;text-align:left;border-radius:5px;font-size:10px}.topMenu button:hover{background:#f4f3f6}
 @media(max-width:850px){.editorBody{grid-template-columns:1fr}.aiPanel{position:fixed;left:0;top:56px;bottom:0;width:min(355px,92vw);z-index:40;box-shadow:15px 0 35px #0002;transform:translateX(-105%);transition:transform .22s ease}.aiPanel.mobileOpen{transform:translateX(0)}.appPreview{grid-column:1}.editorNav{display:none}.editorTop{grid-template-columns:1fr auto}.mobileAiToggle{display:inline-flex;width:30px;height:30px;border-radius:6px;align-items:center;justify-content:center;color:#6a4dcc;background:#f1effa;font-size:13px}.editorLeft{gap:4px}.editorRight .saveLabel{display:none}.editorRight{gap:3px}.publishBtn{padding:8px 11px}.previewArea{padding:15px}.previewFrame{height:calc(100vh - 116px);width:min(100%,1080px)}.previewFrame.tablet{width:min(768px,100%)}.previewFrame.mobile{width:min(390px,100%)}.appGrid{grid-template-columns:repeat(2,1fr)}.workspace{padding:38px 18px}}
 @media(max-width:560px){.homeNav{display:none}.homeTop{padding:0 14px}.baseLogo{font-size:17px}.homeActions .credits{display:none}.workspaceHead{display:block}.workspaceHead h1{font-size:31px}.create{margin-top:20px;width:100%}.appGrid{grid-template-columns:1fr}.previewHeader{height:44px;padding:0 8px}.previewControls button{width:30px}.previewTitle{max-width:45vw}.previewArea{padding:8px}.previewFrame{height:calc(100vh - 108px);border-radius:6px}.previewFrame.desktop,.previewFrame.tablet{width:100%}.previewFrame.mobile{width:100%;max-width:390px}.aiPanel{width:min(92vw,355px)}.aiHeader{padding:0 12px}.mobileClose{display:inline-flex!important;width:28px;height:28px;border-radius:6px;align-items:center;justify-content:center;font-size:19px;color:#77747d}.composer{padding-bottom:max(13px,env(safe-area-inset-bottom))}.composer textarea{height:68px;font-size:12px}.composerRow button{min-width:32px;height:30px}.editorTop{height:56px;padding:0 7px}.appName{max-width:145px}.back{width:27px}.editorRight .userDot{width:28px;height:28px}.publishBtn{padding:8px 10px}.codeOverlay{inset:56px 0 0}.codePanel{height:78%}.codeTop{overflow:hidden}.codeTop>div{overflow-x:auto}.codePanel textarea{font-size:11px;padding:12px}.dashboardPreview{height:calc(100vh - 116px);grid-template-columns:1fr}.dashSide{display:none}.dashMain{padding:20px}.dashCards{grid-template-columns:1fr}.canvasGrid{padding:15px}}
+
+
+/* GutHeb Workers dark interface */
+:root{color:#ececf1;background:#111114}
+.authPage,.homePage,.baseEditor{background:#111114;color:#ececf1}
+.authTop,.homeTop,.editorTop,.aiPanel,.previewHeader,.secondary,.createCard,.appCard,.pageMenu,.topMenu,.dashboardPreview,.canvasCard{background:#18181c;color:#ececf1;border-color:#2d2d34}
+.baseLogo{color:#f4f4f7}.baseLogo .logoMark{color:#9a84ff}
+.homeNav,.workspaceHead p,.eyebrow,.saveLabel,.aiHeader small,.welcome p,.message.system,.composerRow,.previewTitle,.dashSide,.dashCards span,.dashboardPanel p,.dashList span,.dashStats span,.canvasToolbar,.canvasCardTitle span,.codeBottom{color:#9898a3}
+.homeTop,.authTop,.editorTop,.aiHeader,.composer,.previewHeader,.codeTop,.codeBottom{border-color:#2d2d34}
+.homePage{background:#111114}.workspace{background:#111114}
+.createCard,.appCard,.authCard{box-shadow:0 8px 28px #0005}
+.createCard:hover,.appCard:hover{border-color:#4b465b;box-shadow:0 10px 30px #0007}
+.createCircle{border-color:#55545e;color:#aaa7b1}
+.appThumb{background:linear-gradient(135deg,#24212f,#2a2740);color:#a594ff}
+.userDot{background:#2a2440;color:#b7a8ff}
+.editorNav{background:#151519;border-color:#2d2d34}.editorNav button{color:#9996a2}.editorNav button.active{background:#29282e;color:#f3f2f5;box-shadow:0 1px 3px #0008}
+.back,.appName,.editorRight>button:not(.publishBtn),.previewTitle button,.previewControls button,.composerRow button,.aiHeader button{color:#aaa7b1}
+.back:hover,.editorRight>button:not(.publishBtn):hover,.previewTitle button:hover,.previewControls button:hover,.composerRow button:hover{background:#29282e}
+.appPreview{background:#101014}.previewArea{background:radial-gradient(circle at 50% 35%,#27272d 0,#17171b 55%,#111114 100%)}
+.previewFrame{border-color:#3a3940;box-shadow:0 10px 35px #0009}
+.aiHeader,.composer{background:#18181c}.chatScroll{background:#18181c}
+.welcomeIcon{background:#292440;color:#a594ff}.welcome h2{color:#f1f0f4}.promptChips button{background:#202025;border-color:#34343c;color:#b5b2bc}.promptChips button:hover{background:#29282f;border-color:#514b66}
+.message.ai>div>div:first-child{color:#d4d1d9}.message.user>div>div:first-child{color:#efedf2}.msgAvatar{background:#29292f;color:#b4b1ba}.message.user .msgAvatar{background:#302750;color:#b7a8ff}
+.composer textarea{background:#121216;border-color:#383840;color:#eceaf0}.composer textarea::placeholder{color:#77747e}.composer textarea:focus{border-color:#7560c7;box-shadow:0 0 0 3px #765bd426}
+.pageMenu button{color:#aaa7b0}.pageMenu button:hover,.pageMenu button.active{background:#2a2636;color:#b9aaff}
+.dashboardPanel{background:#18181c}.dashList,.dashStats span{border-color:#303038}.dashList button{border-color:#2b2b32}.dashList b,.dashStats b{color:#ecebf0}
+.dashboardPreview{background:#18181c}.dashSide{border-color:#2d2d34}.dashSide b{color:#eeeef2}.dashSide .selected{background:#2a2638;color:#b9aaff}.dashMain h1{color:#f0eff3}.dashCards div{border-color:#303038;background:#1d1d22}
+.canvas{background-color:#121216;background-image:radial-gradient(#38373f 1px,transparent 1px)}.canvasToolbar{background:#18181c;border-color:#2d2d34}
+.codeOverlay{background:#0008}
+.topMenu button:hover{background:#29282e}
+.authCard h1{color:#f0eff3}.authCard p{color:#9898a3}.authCard input{background:#121216;border-color:#37373f;color:#eeeef2}.authCard input:focus{border-color:#7560c7;box-shadow:0 0 0 3px #765bd426}.authSwitch{color:#9898a3}.authSwitch button,.linkButton{color:#a594ff}
+.publishedState{background:#111114;color:#9898a3}
+.mobileAiToggle{background:#292440;color:#a594ff}
