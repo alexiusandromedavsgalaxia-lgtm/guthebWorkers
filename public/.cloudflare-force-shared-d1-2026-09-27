@@ -1,1 +1,1 @@
-shared D1 account/profile/repository sync rebuild marker
+shared D1 bindings: USERS_DB=users, REPOS_DB=repos, ARCHIVE_DB=archivecontent, REPOZIP_DB=zip
