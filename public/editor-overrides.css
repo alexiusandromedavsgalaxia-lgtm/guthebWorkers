@@ -13,3 +13,35 @@
 .base44App.light .b44TopActions button{color:#bfc3cb!important}.base44App.light .b44TopActions button:hover,.base44App.light .b44TopActions button.sel{background:#1b1d22!important;color:#fff!important}
 .base44App.light .b44TopActions .publish{background:#fff!important;color:#0b0c0e!important}
 .base44App .siteFrame,.base44App .previewStage iframe{background:#fff!important}
+
+/* Dark chrome for every non-editor screen */
+.authPage,.welcomePage,.homePage,.repoPage{background:#08090b!important;color:#f4f5f7!important;min-height:100vh}
+.authPage input,.welcomePrompt,.homeNav,.repoNav,.repoFiles,.newAppCard,.appCard,.welcomeSection article{background:#101114!important;color:#f4f5f7!important;border-color:#292c33!important}
+.authCard,.homeNav,.repoNav{border-color:#292c33!important;background:rgba(14,15,18,.94)!important}
+.authCard p,.homeTitle p,.repoHero p,.repoEmpty,.welcomeHero p,.welcomeSection p,.appCard small,.newAppCard small{color:#9298a3!important}
+.authPrimary,.darkBtn,.repoOpenBuilder{background:#f4f5f7!important;color:#090a0c!important;border-color:#f4f5f7!important}
+.plainBtn,.authLink,.authBottom button,.homeNav button,.repoNav button{color:#c9cdd5!important;background:transparent!important;border-color:#30343c!important}
+.authLink,.authBottom button{border:0!important}
+.welcomeNav{border-bottom:1px solid #24272d!important;background:rgba(8,9,11,.88)!important}
+.welcomeNav nav a,.welcomeFooter{color:#9ba1ab!important}
+.welcomePrompt{border:1px solid #30333a!important;box-shadow:0 20px 70px rgba(0,0,0,.35)!important}
+.welcomePrompt textarea{background:transparent!important;color:#f4f5f7!important}
+.homeMain,.repoMain{color:#f4f5f7!important}
+.homeTitle h1,.repoHero h1,.welcomeHero h1{color:#f7f7f8!important}
+.newAppCard:hover,.appCard:hover{background:#17191e!important;border-color:#3a3e47!important}
+.fakeThumb{background:#17191e!important;border-color:#30343c!important}
+.repoNav{height:60px!important;border-bottom:1px solid #292c33!important}
+.repoBrand{display:flex!important;align-items:center!important;gap:9px!important}
+.repoBrand img{width:26px!important;height:26px!important}
+.repoMain{max-width:1080px!important;margin:auto!important;padding:42px 24px!important}
+.repoEyebrow{font-size:11px!important;letter-spacing:.12em!important;color:#8f96a2!important}
+.repoMeta{display:flex!important;gap:8px!important;flex-wrap:wrap!important;margin-top:18px!important}
+.repoMeta span{border:1px solid #2c3037!important;background:#111317!important;color:#aeb4bf!important;border-radius:999px!important;padding:6px 9px!important;font-size:11px!important}
+.repoFiles{margin-top:30px!important;border:1px solid #2b2e35!important;border-radius:14px!important;overflow:hidden!important}
+.repoFilesHead{height:48px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 15px!important;background:#15171b!important;border-bottom:1px solid #2b2e35!important}
+.repoFilesHead span{font-size:11px!important;color:#7f8692!important}
+.repoFileRow{min-height:44px!important;display:grid!important;grid-template-columns:28px minmax(0,1fr) 48px!important;align-items:center!important;padding:0 15px!important;border-bottom:1px solid #202329!important;color:#dfe2e7!important}
+.repoFileRow:last-child{border-bottom:0!important}
+.repoFileRow code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.repoFileRow>span:last-child{color:#737a86!important;font-size:11px!important}
+.base44App.light{filter:none!important}
