@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "gutheb-workers",
+  "pages_build_output_dir": "./dist",
+  "d1_databases": [
+    {
+      "binding": "GUTHEB_DB",
+      "database_name": "REPLACE_WITH_SHARED_GUTHEB_D1_NAME",
+      "database_id": "REPLACE_WITH_SHARED_GUTHEB_D1_ID"
+    }
+  ]
+}
