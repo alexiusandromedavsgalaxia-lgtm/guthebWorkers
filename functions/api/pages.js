@@ -45,7 +45,7 @@ export async function onRequestPost({request,env}){
   }
   if(action==="deployment"){
     const projectId=String(b.projectId||"");const own=await pages.prepare("SELECT id FROM page_projects WHERE id=? AND owner_id=?").bind(projectId,user.id).first();if(!own)return json({error:"Project not found."},404);
-    const id=crypto.randomUUID();const status=String(b.status||"published");const url="/pages/#"+encodeURIComponent(id);await pages.prepare("INSERT INTO page_deployments(id,project_id,status,url,metadata,created_at) VALUES(?,?,?,?,?,?)").bind(id,projectId,status,url,JSON.stringify(b.metadata||{}),new Date().toISOString()).run();
+    const id=crypto.randomUUID();const status=String(b.status||"published");const url="/pages/"+encodeURIComponent(id);await pages.prepare("INSERT INTO page_deployments(id,project_id,status,url,metadata,created_at) VALUES(?,?,?,?,?,?)").bind(id,projectId,status,url,JSON.stringify(b.metadata||{}),new Date().toISOString()).run();
     return json({ok:true,id});
   }
   return json({error:"Unknown action."},400);
