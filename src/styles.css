@@ -30,3 +30,13 @@
 .studioRail button{font-size:0!important}.studioRail button:first-letter{font-size:17px}.studioRail button small{font-size:8px!important}.studioRail button{position:relative}.studioRail button:hover:after{content:"";position:absolute;left:56px;white-space:nowrap;background:#17181c;color:#fff;border-radius:6px;padding:5px 7px;font-size:9px;z-index:50;box-shadow:0 8px 25px #0005}
 @media(max-width:800px){.welcomeNav{padding:0 18px}.welcomeNav nav{display:none}.featureGrid{grid-template-columns:1fr 1fr}.appGrid{grid-template-columns:1fr}.homeNav{padding:0 18px}.homeMain{padding:55px 18px}.homeTitle h1{font-size:39px}.welcomeHero{padding-top:75px}}
 @media(max-width:520px){.featureGrid{grid-template-columns:1fr}.welcomePrompt{display:block}.welcomePrompt button{width:100%;margin-top:7px}.welcomeHero h1{font-size:50px}.sectionIntro h2{font-size:34px}}
+
+/* Restore the real code editor: dark, dense, usable, not a blank white panel. */
+.base44App .codeView{height:100%;min-height:0;display:flex;flex-direction:column;background:#0d0f12;color:#e7e9ee;border:1px solid #24272d;border-radius:12px;overflow:hidden}
+.base44App .codeTabs{display:flex;align-items:stretch;min-height:42px;background:#15171b;border-bottom:1px solid #292c32;overflow-x:auto}
+.base44App .codeTabs button{appearance:none;border:0;border-right:1px solid #25282e;background:transparent;color:#858b95;padding:0 14px;font:500 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer;white-space:nowrap}
+.base44App .codeTabs button:hover{background:#1b1e23;color:#cfd3da}
+.base44App .codeTabs button.active{background:#0d0f12;color:#f5f6f8;box-shadow:inset 0 -2px #9b87f5}
+.base44App .codeView>textarea{flex:1;width:100%;min-height:420px;resize:none;box-sizing:border-box;border:0;outline:0;background:#0d0f12;color:#e7e9ee;padding:18px 22px;font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:2;caret-color:#b9a8ff;white-space:pre;overflow:auto}
+.base44App .codeView>textarea::selection{background:#55448a;color:#fff}
+.base44App .codeView>textarea:focus{box-shadow:inset 0 0 0 1px #393044}
