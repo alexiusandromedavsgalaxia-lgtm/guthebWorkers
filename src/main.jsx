@@ -33,8 +33,13 @@ function App(){
  const[auth,setAuth]=useState(path==="/signup"?"register":path==="/reset-password"?"reset":"login");
 
  useEffect(()=>{
-  fetch("/api/account",{credentials:"include"}).then(async r=>r.ok?r.json():null).then(d=>{
-   if(d?.user){state.setAccount(d.user);state.setRepos(d.repos||[]);setScreen(path.startsWith("/builder")?"builder":"home");}
+  fetch("/api/account",{credentials:"include"}).then(async r=>r.ok?r.json():null).then(async d=>{
+   if(d?.user){
+    state.setAccount(d.user);
+    const mr=await fetch("/api/account",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"me"})});
+    if(mr.ok){const md=await mr.json();state.setRepos(md.repos||[]);}
+    setScreen(path.startsWith("/builder")?"builder":"home");
+   }
   }).catch(()=>{});
  },[]);
 
